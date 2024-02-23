@@ -25,21 +25,26 @@ public class UserJpaResource {
 	@Autowired
 	private UserJpaRepository userJpaService;
 	
+	@Autowired
+	private PostJpaRepository postJpaService;
+	
 	@GetMapping(path="/jpa/users")
 	public List<User> listAllUsers(){
 		return userJpaService.findAll();
 	}
+	
+	
 	@GetMapping(path="/jpa/users/{id}")
 	public User listByIdUsers(@PathVariable int id) {
 		Optional<User> user =userJpaService.findById(id);
 		if(user.isEmpty()) {
 			throw new UserNotFoundException("id:"+id);
 		}
-		
+//		
 //		EntityModel<User> userEntity=EntityModel.of(user);
 //		WebMvcLinkBuilder Link = linkTo(methodOn(this.getClass()).listAllUsers());
 //		userEntity.add(Link.withRel("all-users"));
-		
+//		
 		return  user.get();
 	}
 	
@@ -50,6 +55,18 @@ public class UserJpaResource {
 	}
 	
 	
+	@GetMapping(path = "/jpa/users/{id}/posts")
+	public List<Post> listPostsById(@PathVariable int id) {
+	    Optional<User> user = userJpaService.findById(id);
+	    if (user.isEmpty()) {
+	        throw new UserNotFoundException("id:" + id);
+	    }
+	    
+	    return user.get().getListOfPost();
+	}
+ 
+	
+	
 	
 	@PostMapping("/jpa/users")
 	public ResponseEntity<User> createUser(@Valid @RequestBody User user){
@@ -58,6 +75,27 @@ public class UserJpaResource {
 		URI location =ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(saveUser.getId()).toUri();
 		return ResponseEntity.created(location).build();
 		
+	}
+	
+	
+	@PostMapping(path = "/jpa/users/{id}/posts")
+	public ResponseEntity<Post> createPostforUser(@PathVariable int id,@Valid @RequestBody Post post) {
+		Optional<User> user = userJpaService.findById(id);
+	    
+	    if (user.isEmpty()) {
+	        throw new UserNotFoundException("id:" + id);
+	    }
+	     post.setUser(user.get());
+	   
+	    
+		 Post postSaved= postJpaService.save(post);
+		 
+		 URI location =ServletUriComponentsBuilder
+				 .fromCurrentRequest()
+				 .path("/{id}")
+				 .buildAndExpand(postSaved.getId())
+				 .toUri();
+			return ResponseEntity.created(location).build();
 	}
 	
 	

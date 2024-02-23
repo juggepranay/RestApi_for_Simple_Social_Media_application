@@ -13,9 +13,9 @@ public class UserDoaService {
 	static int countUser=0;
 	
 	static {
-		users.add(new User(++countUser,"pranay",LocalDate.now()));
-		users.add(new User(++countUser,"dharani",LocalDate.now()));
-		users.add(new User(++countUser,"goutami",LocalDate.now()));
+		users.add(new User(++countUser, "pranay", LocalDate.now().minusYears(23)));
+        users.add(new User(++countUser, "Deepak", LocalDate.now().minusYears(32)));
+        users.add(new User(++countUser, "Vinay", LocalDate.now().minusYears(29)));
 	}
 	
 	public List<User> retriveALlUsers(){
